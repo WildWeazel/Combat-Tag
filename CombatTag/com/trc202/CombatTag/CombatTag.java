@@ -28,16 +28,20 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/* Erocs: Removing dependency on Heroes
 import com.herocraftonline.heroes.Heroes;
 import com.herocraftonline.heroes.characters.CharacterManager;
 import com.herocraftonline.heroes.characters.Hero;
+*/
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
+/* Erocs: Removing dependency on Warzone
 import com.tommytony.war.Warzone;
+*/
 import com.topcat.npclib.NPCManager;
 import com.topcat.npclib.entity.NPC;
 import com.trc202.CombatTagListeners.CombatTagCommandPrevention;
@@ -352,11 +356,14 @@ public class CombatTag extends JavaPlugin {
 	}
 
 	public boolean WarArenaHook(Player plr){
+        /* Erocs: Removing dependency on Warzone
 		boolean notInArena = true;
 		if(getServer().getPluginManager().getPlugin("War") != null){
 			notInArena = Warzone.getZoneByPlayerName(plr.getName()) == null && Warzone.getZoneByPlayerName(plr.getName()) == null;
 		}
 		return notInArena;
+        */
+        return true;
 	}
 	
 	public WorldGuardPlugin getWorldGuard() {
@@ -371,21 +378,26 @@ public class CombatTag extends JavaPlugin {
 	}
 	
 	public Plugin getHeroes() {
+        /* Erocs: Removing dependency on Heroes
 	    Plugin plugin = getServer().getPluginManager().getPlugin("Heroes");
 	 
 	    if (plugin == null || !(plugin instanceof Heroes)) {
 	        return null;
 	    }
 	    return plugin;
+        */
+        return null;
 	}
 	
 	public void heroesSyncHealth(Player player, int health){
+        /* Erocs: Removing dependency on Heroes
 		Plugin heroes = getHeroes();
 		if(heroes == null){return;}
 		CharacterManager hcm = new CharacterManager((Heroes) heroes);
 		Hero hero = hcm.getHero(player);
 		hero.setHealth(health);
 		hero.syncHealth();
+        */
 	}
 	
 	public boolean InWGCheck(Player plr){
