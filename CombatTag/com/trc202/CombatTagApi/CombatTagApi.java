@@ -69,4 +69,13 @@ public class CombatTagApi {
 		if(plugin.npcm.isNPC(player)){return true;}
 		return false;
 	}
+
+	/**
+	 * Returns an NPC's player name
+	 * @param entity
+	 * @return the NPC's player name
+	 */
+    public String getNPCPlayerName(Entity entity){
+        return plugin.getPlayerName(entity);
+    }
 }
