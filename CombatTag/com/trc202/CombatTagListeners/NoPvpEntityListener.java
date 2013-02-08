@@ -86,7 +86,8 @@ public class NoPvpEntityListener implements Listener{
 		PlayerDataContainer damagerData;
 		PlayerDataContainer damagedData;
 		
-		if(plugin.ctIncompatible.notInArena(damaged,damager)){
+// Erocs: Remove non-CivCraft plugin references
+//		if(plugin.ctIncompatible.notInArena(damaged,damager)){
 			if(!damager.hasPermission("combattag.ignore")){	
 				//Get damager player data container
 				if(plugin.hasDataContainer(damager.getName())){
@@ -118,6 +119,7 @@ public class NoPvpEntityListener implements Listener{
 				}
 				damagedData.setPvPTimeout(plugin.getTagDuration());
 			}
-		}
+// Erocs: Remove non-CivCraft plugin references
+//		}
 	}
 }

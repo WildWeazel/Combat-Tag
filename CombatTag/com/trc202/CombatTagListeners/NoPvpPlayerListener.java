@@ -85,9 +85,10 @@ public class NoPvpPlayerListener implements Listener{
 					plugin.removeDataContainer(quitPlr.getName());
 				}else{
 					boolean willSpawn = true;
-					if(plugin.settings.dontSpawnInWG()){
-						willSpawn = plugin.ctIncompatible.InWGCheck(quitPlr);
-					}
+// Erocs: Remove non-CivCraft plugin references
+//					if(plugin.settings.dontSpawnInWG()){
+//						willSpawn = plugin.ctIncompatible.InWGCheck(quitPlr);
+//					}
 					if(willSpawn){
 						NPC npc = plugin.spawnNpc(quitPlr, quitPlr.getLocation());
 						if(npc.getBukkitEntity() instanceof Player){

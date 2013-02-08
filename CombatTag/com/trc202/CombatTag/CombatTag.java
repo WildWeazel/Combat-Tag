@@ -47,7 +47,8 @@ public class CombatTag extends JavaPlugin {
 	private HashMap<String,PlayerDataContainer> playerData;
 	private static String mainDirectory = "plugins/CombatTag";
 
-	public final CombatTagIncompatibles ctIncompatible= new CombatTagIncompatibles(this); 
+// Erocs: Remove non-CivCraft plugin references
+//	public final CombatTagIncompatibles ctIncompatible= new CombatTagIncompatibles(this); 
 	private final NoPvpPlayerListener plrListener = new NoPvpPlayerListener(this); 
 	public final NoPvpEntityListener entityListener = new NoPvpEntityListener(this);
 	private final NoPvpBlockListener blockListener = new NoPvpBlockListener(this);
