@@ -6,8 +6,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
-
 import com.trc202.CombatTag.CombatTag;
+
 
 public class CombatTagCommandPrevention implements Listener{
 	
@@ -17,17 +17,27 @@ public class CombatTagCommandPrevention implements Listener{
 		this.plugin = plugin;
 	}
 	
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event)
     {
 		Player player = event.getPlayer();
 		if(plugin.hasDataContainer(player.getName()) && !plugin.getPlayerData(player.getName()).hasPVPtagExpired()){
+			String command = event.getMessage();
 			for(String disabledCommand : plugin.settings.getDisabledCommands()){
-				if(event.getMessage().equalsIgnoreCase(disabledCommand)){
-					if(plugin.isDebugEnabled()){plugin.log.info("[CombatTag] Combat tag has blocked the command: " + disabledCommand + " .");}
-					player.sendMessage("This command is disabled while in combat");
-					event.setCancelled(true);
-					return;
+				if(command.indexOf(" ") == disabledCommand.length()){
+					if(command.substring(0, command.indexOf(" ")).equalsIgnoreCase(disabledCommand)){
+						if(plugin.isDebugEnabled()){plugin.log.info("[CombatTag] Combat Tag has blocked the command: " + disabledCommand + " .");}
+						player.sendMessage("[CombatTag] This command is disabled while in combat");
+						event.setCancelled(true);
+						return;
+					}
+				} else if(disabledCommand.indexOf(" ") > 0){
+					if(command.toLowerCase().startsWith(disabledCommand.toLowerCase())){
+						if(plugin.isDebugEnabled()){plugin.log.info("[CombatTag] Combat Tag has blocked the command: " + disabledCommand + " .");}
+						player.sendMessage("[CombatTag] This command is disabled while in combat");
+						event.setCancelled(true);
+						return;
+					}
 				}
 			}
 		}else if(plugin.hasDataContainer(player.getName()) && plugin.getPlayerData(player.getName()).hasPVPtagExpired()){

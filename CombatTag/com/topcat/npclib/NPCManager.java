@@ -6,13 +6,13 @@ import com.topcat.npclib.nms.BServer;
 import com.topcat.npclib.nms.BWorld;
 import com.topcat.npclib.nms.NPCEntity;
 import com.topcat.npclib.nms.NPCNetworkManager;
-import net.minecraft.server.v1_4_6.Entity;
-import net.minecraft.server.v1_4_6.PlayerInteractManager;
-import net.minecraft.server.v1_4_6.WorldServer;
+import net.minecraft.server.v1_4_R1.Entity;
+import net.minecraft.server.v1_4_R1.PlayerInteractManager;
+import net.minecraft.server.v1_4_R1.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_4_6.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_4_R1.entity.CraftEntity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -212,7 +212,8 @@ public class NPCManager {
 		HumanNPC npc = (HumanNPC) getNPC(id);
 		npc.setName(name);
 		BWorld b = getBWorld(npc.getBukkitEntity().getLocation().getWorld());
-		WorldServer s = b.getWorldServer();
+		WorldServer s = (WorldServer) b.getWorldServer();
+		
 		try {
 			Method m = s.getClass().getDeclaredMethod("b", new Class[] {Entity.class});
 			m.setAccessible(true);

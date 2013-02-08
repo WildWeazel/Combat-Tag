@@ -1,15 +1,18 @@
 package com.trc202.CombatTagListeners;
 
-import net.minecraft.server.v1_4_6.EntityPlayer;
+import net.minecraft.server.v1_4_R1.EntityPlayer;
 
 import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_4_6.entity.CraftPlayer;
+import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_4_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -32,7 +35,7 @@ public class NoPvpPlayerListener implements Listener{
     	plugin = instance;
     }
     
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent event){
 		Player loginPlayer = event.getPlayer();
 		if(plugin.hasDataContainer(loginPlayer.getName())){
@@ -43,7 +46,7 @@ public class NoPvpPlayerListener implements Listener{
 				//despawn the npc and transfer any effects over to the player
 				CraftPlayer cPlayer = (CraftPlayer) loginPlayer;
 				EntityPlayer ePlayer = cPlayer.getHandle();
-				ePlayer.invulnerableTicks = 2;
+				ePlayer.invulnerableTicks = 0;
 				plugin.despawnNPC(loginDataContainer);
 			}
 			if(loginDataContainer.shouldBePunished()){
@@ -54,7 +57,7 @@ public class NoPvpPlayerListener implements Listener{
 				loginPlayer.setHealth(healthSet);
 				assert(loginPlayer.getHealth() == loginDataContainer.getHealth());
 				loginPlayer.setLastDamageCause(new EntityDamageEvent(loginPlayer, DamageCause.ENTITY_EXPLOSION, 0));
-				loginPlayer.setNoDamageTicks(2);
+				loginPlayer.setNoDamageTicks(0);
 			}
 			if(loginPlayer.getHealth() > 0){
 				loginDataContainer.setPvPTimeout(plugin.getTagDuration());
@@ -64,10 +67,13 @@ public class NoPvpPlayerListener implements Listener{
 		}
 	}
 	
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerQuit(PlayerQuitEvent e){
 		Player quitPlr = e.getPlayer();
-		if(plugin.hasDataContainer(quitPlr.getName())){
+		if(quitPlr.isDead()){
+			plugin.entityListener.onPlayerDeath(quitPlr);
+		}
+		else if(plugin.hasDataContainer(quitPlr.getName())){
 			//Player is likely in pvp
 			PlayerDataContainer quitDataContainer = plugin.getPlayerData(quitPlr.getName());
 			if(!quitDataContainer.hasPVPtagExpired()){
@@ -80,7 +86,7 @@ public class NoPvpPlayerListener implements Listener{
 				}else{
 					boolean willSpawn = true;
 					if(plugin.settings.dontSpawnInWG()){
-						willSpawn = plugin.InWGCheck(quitPlr);
+						willSpawn = plugin.ctIncompatible.InWGCheck(quitPlr);
 					}
 					if(willSpawn){
 						NPC npc = plugin.spawnNpc(quitPlr, quitPlr.getLocation());
@@ -118,15 +124,26 @@ public class NoPvpPlayerListener implements Listener{
     		}
     	}
     }
-	
-	@EventHandler(priority = EventPriority.HIGHEST)
+    
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerInteract(PlayerInteractEvent event){
+    	if(plugin.hasDataContainer(event.getPlayer().getName())){
+    		PlayerDataContainer playerData = plugin.getPlayerData(event.getPlayer().getName());
+    		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && event.getItem().getType() == Material.ENDER_PEARL && !playerData.hasPVPtagExpired() && plugin.settings.blockEnderPearl()){
+    			event.getPlayer().sendMessage(ChatColor.RED + "[CombatTag] You can't ender pearl while tagged.");
+    			event.setCancelled(true);
+    		}
+    	}
+    }
+    
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onTeleport(PlayerTeleportEvent event){
 		if(plugin.hasDataContainer(event.getPlayer().getName())){
 			PlayerDataContainer playerData = plugin.getPlayerData(event.getPlayer().getName());
 			if(plugin.settings.blockTeleport() == true && !playerData.hasPVPtagExpired()){
 				TeleportCause cause = event.getCause();
 				if(cause == TeleportCause.PLUGIN || cause == TeleportCause.COMMAND){
-					event.getPlayer().sendMessage(ChatColor.RED + "[CombatTag] You can't teleport while tagged");
+					event.getPlayer().sendMessage(ChatColor.RED + "[CombatTag] You can't teleport while tagged.");
 					event.setCancelled(true);
 				}
 			}
