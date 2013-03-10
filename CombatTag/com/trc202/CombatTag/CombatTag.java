@@ -27,6 +27,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.topcat.npclib.NPCManager;
 import com.topcat.npclib.entity.NPC;
+import com.trc202.CombatTagEvents.NpcDespawnEvent;
+import com.trc202.CombatTagEvents.NpcDespawnReason;
 import com.trc202.CombatTagListeners.CombatTagCommandPrevention;
 import com.trc202.CombatTagListeners.NoPvpBlockListener;
 import com.trc202.CombatTagListeners.NoPvpEntityListener;
@@ -82,7 +84,7 @@ public class CombatTag extends JavaPlugin {
 			if(npc != null){
 				if(isDebugEnabled()){log.info("[CombatTag] Disable npc for: " + pdc.getPlayerName() + " !");}
 				updatePlayerData(npc, pdc.getPlayerName());
-				despawnNPC(pdc);
+				despawnNPC(pdc, NpcDespawnReason.PLUGIN_DISABLED);
 			}
 		}
 		//Just in case...
@@ -145,11 +147,15 @@ public class CombatTag extends JavaPlugin {
 	 * Despawns npc and copys all contents from npc to player data
 	 * @param plrData 
 	 */
-	public void despawnNPC(PlayerDataContainer plrData) {
+	public void despawnNPC(PlayerDataContainer plrData, NpcDespawnReason reason) {
 		if(isDebugEnabled()){log.info("[CombatTag] Despawning NPC for " + plrData.getPlayerName());}
 		NPC npc = npcm.getNPC(plrData.getNPCId());
-		if(npc != null){			
+		if(npc != null){
 			updatePlayerData(npc, plrData.getPlayerName());
+			// Fire event after updating player data so objects can be removed
+			// from the inventory
+			NpcDespawnEvent event = new NpcDespawnEvent(this, reason, plrData, npc);
+			this.getServer().getPluginManager().callEvent(event);
 			npcm.despawnById(plrData.getNPCId());
 			plrData.setNPCId("");
 			plrData.setSpawnedNPC(false);
@@ -320,7 +326,7 @@ public class CombatTag extends JavaPlugin {
 						updatePlayerData(npc, plrData.getPlayerName());
 					}
 				} else {
-					despawnNPC(plrData);
+					despawnNPC(plrData, NpcDespawnReason.DESPAWN_TIMEOUT);
 				}
 			}
 		}, despawnTicks);
@@ -341,11 +347,11 @@ public class CombatTag extends JavaPlugin {
 			target = (entity == null) ? null : (Player) entity.getBukkitEntity();
 			//Equivalent to
 			/*
-            if(entity == null){
-                target = null;
-            }else{
-                target = entity.getBukkitEntity();
-            }
+			if(entity == null){
+				target = null;
+			}else{
+				target = entity.getBukkitEntity();
+			}
 			 */
 			if(target != null){
 				target.loadData();

@@ -22,6 +22,7 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import com.topcat.npclib.NPCManager;
 import com.topcat.npclib.entity.NPC;
 import com.trc202.CombatTag.CombatTag;
+import com.trc202.CombatTagEvents.NpcDespawnReason;
 import com.trc202.Containers.PlayerDataContainer;
 
 public class NoPvpPlayerListener implements Listener{
@@ -47,7 +48,7 @@ public class NoPvpPlayerListener implements Listener{
 				CraftPlayer cPlayer = (CraftPlayer) loginPlayer;
 				EntityPlayer ePlayer = cPlayer.getHandle();
 				ePlayer.invulnerableTicks = 0;
-				plugin.despawnNPC(loginDataContainer);
+				plugin.despawnNPC(loginDataContainer, NpcDespawnReason.PLAYER_LOGIN);
 			}
 			if(loginDataContainer.shouldBePunished()){
 				loginPlayer.setExp(loginDataContainer.getExp());
