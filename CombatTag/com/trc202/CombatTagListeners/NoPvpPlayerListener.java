@@ -1,10 +1,10 @@
 package com.trc202.CombatTagListeners;
 
-import net.minecraft.server.v1_4_R1.EntityPlayer;
+import net.minecraft.server.v1_5_R2.EntityPlayer;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_4_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_5_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -49,6 +49,9 @@ public class NoPvpPlayerListener implements Listener{
 				EntityPlayer ePlayer = cPlayer.getHandle();
 				ePlayer.invulnerableTicks = 0;
 				plugin.despawnNPC(loginDataContainer, NpcDespawnReason.PLAYER_LOGIN);
+				if(loginPlayer.getHealth() > 0){
+					loginDataContainer.setPvPTimeout(plugin.getTagDuration());
+				}
 			}
 			if(loginDataContainer.shouldBePunished()){
 				loginPlayer.setExp(loginDataContainer.getExp());
@@ -59,9 +62,6 @@ public class NoPvpPlayerListener implements Listener{
 				assert(loginPlayer.getHealth() == loginDataContainer.getHealth());
 				loginPlayer.setLastDamageCause(new EntityDamageEvent(loginPlayer, DamageCause.ENTITY_EXPLOSION, 0));
 				loginPlayer.setNoDamageTicks(0);
-			}
-			if(loginPlayer.getHealth() > 0){
-				loginDataContainer.setPvPTimeout(plugin.getTagDuration());
 			}
 			loginDataContainer.setShouldBePunished(false);
 			loginDataContainer.setSpawnedNPC(false);
