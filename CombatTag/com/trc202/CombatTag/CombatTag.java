@@ -215,31 +215,6 @@ public class CombatTag extends JavaPlugin {
 		return settings.isDebugEnabled();
 	}
 
-	/**
-	 * Kills player and sets their inventory to an empty stack
-	 * @param deadPlayerData
-	 */
-
-	public void killPlayerEmptyInventory(PlayerDataContainer deadPlayerData) {
-		deadPlayerData.setExp(0);
-		ItemStack airItem = new ItemStack(Material.AIR);
-		ItemStack[] emptyStack = new ItemStack[36];
-		for(int x = 0; x < emptyStack.length; x++){
-			emptyStack[x] = airItem;
-		}
-		ItemStack[] emptyArmorStack = new ItemStack[4];
-		for(int x = 0; x < emptyArmorStack.length; x++){
-			emptyArmorStack[x] = airItem;
-		}
-		deadPlayerData.setPlayerArmor(emptyArmorStack);
-		deadPlayerData.setPlayerInventory(emptyStack);
-		deadPlayerData.setHealth(0);
-		deadPlayerData.setSpawnedNPC(false);
-		deadPlayerData.setNPCId("");
-		deadPlayerData.setPvPTimeout(0);
-		if (isDebugEnabled()) {log.info("[CombatTag] " + deadPlayerData.getPlayerName() + " has been killed by Combat Tag and their inventory has been emptied.");}
-	}
-	
 	public void emptyInventory(Player target) {
 		PlayerInventory targetInv = target.getInventory();
 		targetInv.clear();
@@ -292,8 +267,10 @@ public class CombatTag extends JavaPlugin {
 			} else if(args[0].equals("wipe")){
 				if(sender.hasPermission("combattag.wipe")){
 					int numNPC = 0;
+					PlayerDataContainer despawn;
 					for(NPC npc: npcm.getNPCs()){
-						log.info(npcm.getNPCIdFromEntity(npc.getBukkitEntity())); //
+						despawn = getPlayerData(npcm.getNPCIdFromEntity(npc.getBukkitEntity()));
+						despawn.setSpawnedNPC(false);
 						updatePlayerData(npc, npcm.getNPCIdFromEntity(npc.getBukkitEntity()));
 						npcm.despawnById(npcm.getNPCIdFromEntity(npc.getBukkitEntity()));
 						numNPC++;
@@ -316,13 +293,13 @@ public class CombatTag extends JavaPlugin {
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			@Override
 			public void run() {
-				if((kill == false) && (kill == true)){
-					if(npcm.getNPC(plrData.getNPCId()) != null){
+				if(plrData.hasSpawnedNPC() == true){
+					if(kill == true){
 						plrNpc.setHealth(0);
 						updatePlayerData(npc, plrData.getPlayerName());
+					} else {
+						despawnNPC(plrData, NpcDespawnReason.DESPAWN_TIMEOUT);
 					}
-				} else {
-					despawnNPC(plrData, NpcDespawnReason.DESPAWN_TIMEOUT);
 				}
 			}
 		}, despawnTicks);
