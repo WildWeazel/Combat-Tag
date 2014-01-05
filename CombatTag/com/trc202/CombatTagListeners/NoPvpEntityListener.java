@@ -1,7 +1,5 @@
 package com.trc202.CombatTagListeners;
 
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -86,48 +84,10 @@ public class NoPvpEntityListener implements Listener{
 	private void onPlayerDamageByPlayerNPCMode(Player damager, Player damaged){
 		if(plugin.npcm.isNPC(damaged)){return;} //If the damaged player is an npc do nothing
 		
-		if(plugin.ctIncompatible.WarArenaHook(damager) && plugin.ctIncompatible.WarArenaHook(damaged)){
-			if(!damager.hasPermission("combattag.ignore") && (damager.getGameMode() != GameMode.CREATIVE)){	
-				if(plugin.settings.isSendMessageWhenTagged() && !plugin.isInCombat(damager.getName())){
-					String tagMessage = plugin.settings.getTagMessageDamager();
-					tagMessage = tagMessage.replace("[player]", "" + damaged.getName());
-					damager.sendMessage(ChatColor.RED + "[CombatTag] " + tagMessage);
-				}
-				if(plugin.isDebugEnabled()){
-					plugin.log.info("[CombatTag] " + damager.getName() + " tagged " + damaged.getName() + ", setting pvp timeout");
-				}
-				plugin.addTagged(damager);
-			}
-			if(!damaged.hasPermission("combattag.ignore") && !plugin.settings.onlyDamagerTagged()){	
-				if(!plugin.isInCombat(damaged.getName())){
-					if(plugin.settings.isSendMessageWhenTagged()){
-						String tagMessage = plugin.settings.getTagMessageDamaged();
-						tagMessage = tagMessage.replace("[player]", damager.getName());
-						damaged.sendMessage(ChatColor.RED + "[CombatTag] " + tagMessage);
-					}
-				}
-				plugin.addTagged(damaged);
-			}
-		}
 	}
 	
 	private void onPlayerDamageByMobNPCMode(LivingEntity damager, Player damaged) {
 		if(plugin.npcm.isNPC(damaged)){return;} //If the damaged player is an npc do nothing
 		if(damager == null){return;}
-		if(plugin.ctIncompatible.WarArenaHook(damaged)){
-			if(!damaged.hasPermission("combattag.ignoremob")){	
-				if(!plugin.isInCombat(damaged.getName())){
-					if(plugin.settings.isSendMessageWhenTagged()){
-						String tagMessage = plugin.settings.getTagMessageDamaged();
-						tagMessage = tagMessage.replace("[player]", damager.getType().name());
-						damaged.sendMessage(ChatColor.RED + "[CombatTag] " + tagMessage);
-					}
-					if(plugin.isDebugEnabled()){
-						plugin.log.info("[CombatTag] " + damager.getType().name() + " tagged " + damaged.getName() + ", setting pvp timeout");
-					}
-				}
-				plugin.addTagged(damaged);
-			}
-		}
 	}
 }

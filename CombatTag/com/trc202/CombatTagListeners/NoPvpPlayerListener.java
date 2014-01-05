@@ -14,9 +14,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.entity.Damageable;
 
 import com.topcat.npclib.entity.NPC;
 import com.trc202.CombatTag.CombatTag;
+import com.trc202.CombatTagEvents.NpcDespawnReason;
 
 public class NoPvpPlayerListener implements Listener {
     private final CombatTag plugin;
@@ -36,8 +38,8 @@ public class NoPvpPlayerListener implements Listener {
         if (plugin.inTagged(loginPlayer.getName())) {
             //Player has an NPC and is likely to need some sort of punishment
             loginPlayer.setNoDamageTicks(0);
-            plugin.despawnNPC(loginPlayer.getName());
-            if (loginPlayer.getHealth() > 0) {
+            plugin.despawnNPC(loginPlayer.getName(),NpcDespawnReason.PLAYER_LOGIN);
+            if ( ((Damageable) loginPlayer).getHealth() > 0) {
             	plugin.addTagged(loginPlayer);
             } else {
             	plugin.removeTagged(loginPlayer.getName());
@@ -57,7 +59,7 @@ public class NoPvpPlayerListener implements Listener {
                 if (plugin.isDebugEnabled()) {
                     plugin.log.info("[CombatTag] " + quitPlr.getName() + " has logged of during pvp!");
                 }
-                if (plugin.settings.isInstaKill() || quitPlr.getHealth() <= 0) {
+                if (plugin.settings.isInstaKill() || ((Damageable) quitPlr).getHealth() <= 0) {
                     plugin.log.info("[CombatTag] " + quitPlr.getName() + " has been instakilled!");
                     quitPlr.damage(1000L);
                     plugin.removeTagged(quitPlr.getName());
@@ -72,7 +74,7 @@ public class NoPvpPlayerListener implements Listener {
                             Player npcPlayer = (Player) npc.getBukkitEntity();
                             plugin.copyContentsNpc(npc, quitPlr);
                             npcPlayer.setMetadata("NPC", new FixedMetadataValue(plugin, "NPC"));
-                            double healthSet = plugin.healthCheck(quitPlr.getHealth());
+                            double healthSet = plugin.healthCheck( ((Damageable) quitPlr).getHealth());
                             npcPlayer.setHealth(healthSet);
                             quitPlr.getWorld().createExplosion(quitPlr.getLocation(), explosionDamage); //Create the smoke effect //
                             if (plugin.settings.getNpcDespawnTime() > 0) {

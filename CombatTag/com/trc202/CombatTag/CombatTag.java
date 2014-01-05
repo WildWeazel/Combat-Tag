@@ -30,10 +30,13 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.StringUtil;
+import org.bukkit.entity.Damageable;
 
 import com.google.common.collect.ImmutableList;
 import com.topcat.npclib.NPCManager;
 import com.topcat.npclib.entity.NPC;
+import com.trc202.CombatTagEvents.NpcDespawnEvent;
+import com.trc202.CombatTagEvents.NpcDespawnReason;
 import com.trc202.CombatTagListeners.CombatTagCommandPrevention;
 import com.trc202.CombatTagListeners.NoPvpBlockListener;
 import com.trc202.CombatTagListeners.NoPvpEntityListener;
@@ -110,7 +113,7 @@ public class CombatTag extends JavaPlugin {
                     log.info("[CombatTag] Disable npc for: " + pdc + " !");
                 }
                 updatePlayerData(npc, pdc);
-                despawnNPC(pdc);
+                despawnNPC(pdc,NpcDespawnReason.PLUGIN_DISABLED);
             }
         }
         //Just in case...
@@ -209,14 +212,18 @@ public class CombatTag extends JavaPlugin {
      *
      * @param plrData
      */
-    public void despawnNPC(String playerName) {
+    public void despawnNPC(String PlayerName, NpcDespawnReason reason) {
         if (isDebugEnabled()) {
-            log.info("[CombatTag] Despawning NPC for " + playerName);
+            log.info("[CombatTag] Despawning NPC for " + PlayerName);
         }
-        NPC npc = npcm.getNPC(playerName);
+        NPC npc = npcm.getNPC(PlayerName);
         if (npc != null) {
-            updatePlayerData(npc, playerName);
-            npcm.despawnById(playerName);
+            updatePlayerData(npc, PlayerName);
+            // Fire event after updating player data so objects can be removed
+            // from the inventory
+            NpcDespawnEvent event = new NpcDespawnEvent(this, reason, npc);
+            this.getServer().getPluginManager().callEvent(event);
+            npcm.despawnById(PlayerName);
         }
     }
 
@@ -388,19 +395,19 @@ public class CombatTag extends JavaPlugin {
             	if(Bukkit.getServer().getPlayerExact(name) == null){
             		if (npcm.getNPC(name) != null) {
             			if (kill == true) {
-            				plrNpc.setHealth(0);
+            				plrNpc.setHealth(0.0);
             				updatePlayerData(npc, name);
             			} else {
-            				despawnNPC(name);
+            				despawnNPC(name,NpcDespawnReason.DESPAWN_TIMEOUT);
             			}
             		}
             	} else if(!Bukkit.getServer().getPlayerExact(name).isOnline()){
             		if (npcm.getNPC(name) != null) {
             			if (kill == true) {
-            				plrNpc.setHealth(0);
+            				plrNpc.setHealth(0.0);
             				updatePlayerData(npc, name);
             			} else {
-            				despawnNPC(name);
+            				despawnNPC(name,NpcDespawnReason.DESPAWN_TIMEOUT);
             			}
             		}
             	}
@@ -437,7 +444,7 @@ public class CombatTag extends JavaPlugin {
         if (target != null && (npcm.getNPC(playerName) == npc) && npc != null) {
             EntityHuman humanTarget = ((CraftHumanEntity) target).getHandle();
             Player source = (Player) npc.getBukkitEntity();
-            if (source.getHealth() <= 0) {
+            if (((Damageable) source).getHealth() <= 0) {
                 emptyInventory(target);
                 ItemStack airItem = new ItemStack(Material.AIR);
                 ItemStack[] emptyArmorStack = new ItemStack[4];
@@ -473,7 +480,7 @@ public class CombatTag extends JavaPlugin {
         target.setFireTicks(source.getFireTicks());
         if (target instanceof CraftHumanEntity) {
             EntityHuman humanTarget = ((CraftHumanEntity) target).getHandle();
-            double healthSet = healthCheck(source.getHealth());
+            double healthSet = healthCheck( ((Damageable) source).getHealth());
             humanTarget.setHealth((float) healthSet);
         } else {
             log.info("[CombatTag] An error has occurred! Target is not a HumanEntity!");

@@ -65,4 +65,14 @@ public class CombatTagApi {
 	public void untagPlayer(Player player){
 		plugin.removeTagged(player.getName());
 	}
+
+	
+	 /**
+	  * Returns an NPC's player name
+      * @param entity
+	  * @return the NPC's player name
+      */
+	 public String getNPCPlayerName(Entity entity){
+		 return plugin.getPlayerName(entity);
+	 }
 }
