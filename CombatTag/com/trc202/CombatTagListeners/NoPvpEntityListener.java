@@ -1,5 +1,6 @@
 package com.trc202.CombatTagListeners;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -83,7 +84,16 @@ public class NoPvpEntityListener implements Listener{
 	
 	private void onPlayerDamageByPlayerNPCMode(Player damager, Player damaged){
 		if(plugin.npcm.isNPC(damaged)){return;} //If the damaged player is an npc do nothing
-		
+		if(!damaged.hasPermission("combattag.ignore") && !plugin.settings.onlyDamagerTagged()){  
+			if(!plugin.isInCombat(damaged.getName())){
+				if(plugin.settings.isSendMessageWhenTagged()){
+					String tagMessage = plugin.settings.getTagMessageDamaged();
+					tagMessage = tagMessage.replace("[player]", damager.getName());
+					damaged.sendMessage(ChatColor.RED + "[CombatTag] " + tagMessage);
+				}
+			}
+			plugin.addTagged(damaged);
+		}
 	}
 	
 	private void onPlayerDamageByMobNPCMode(LivingEntity damager, Player damaged) {
