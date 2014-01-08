@@ -212,18 +212,18 @@ public class CombatTag extends JavaPlugin {
      *
      * @param plrData
      */
-    public void despawnNPC(String PlayerName, NpcDespawnReason reason) {
+    public void despawnNPC(String playerName, NpcDespawnReason reason) {
         if (isDebugEnabled()) {
-            log.info("[CombatTag] Despawning NPC for " + PlayerName);
+            log.info("[CombatTag] Despawning NPC for " + playerName);
         }
-        NPC npc = npcm.getNPC(PlayerName);
+        NPC npc = npcm.getNPC(playerName);
         if (npc != null) {
-            updatePlayerData(npc, PlayerName);
+            updatePlayerData(npc, playerName);
             // Fire event after updating player data so objects can be removed
             // from the inventory
-            NpcDespawnEvent event = new NpcDespawnEvent(this, reason, npc);
+            NpcDespawnEvent event = new NpcDespawnEvent(this, reason, playerName, npc);
             this.getServer().getPluginManager().callEvent(event);
-            npcm.despawnById(PlayerName);
+            npcm.despawnById(playerName);
         }
     }
 

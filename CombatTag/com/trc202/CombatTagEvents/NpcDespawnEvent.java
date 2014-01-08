@@ -16,14 +16,17 @@ public class NpcDespawnEvent extends Event {
 
     private final CombatTag plugin_;
     private final NpcDespawnReason reason_;
+    private final String playerName_;
     private final NPC npc_;
 
     public NpcDespawnEvent(
             final CombatTag plugin,
             final NpcDespawnReason reason,
+            final String playerName,
             final NPC npc) {
         plugin_ = plugin;
         reason_ = reason;
+        playerName_ = playerName;
         npc_ = npc;
     }
 
@@ -37,6 +40,10 @@ public class NpcDespawnEvent extends Event {
 
     public NpcDespawnReason getReason() {
         return reason_;
+    }
+
+    public String getPlayerName() {
+        return playerName_;
     }
 
     public NPC getNpc() {
