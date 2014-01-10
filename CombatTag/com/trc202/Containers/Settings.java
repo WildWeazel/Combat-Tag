@@ -39,8 +39,8 @@ public class Settings {
 		droptagonkick = true;
 		commandMessageTagged = "You are in combat for [time] seconds.";
 		commandMessageNotTagged = "You are not currently in combat!";
-		tagMessageDamager = "You have hit [player]. Type /ct to check your remaining tag time.";
-		tagMessageDamaged = "You have been hit by [player]. Type /ct to check your remaining tag time.";
+		tagMessageDamager = "You hit [player]. Type /ct to check your remaining tag time.";
+		tagMessageDamaged = "[player] hit you. Type /ct to check your remaining tag time.";
 		blockTeleport = false;
 		blockEnderPearl = false;
 		dontSpawnInWG = false;
