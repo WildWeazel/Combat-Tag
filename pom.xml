@@ -6,9 +6,9 @@
   <groupId>com.untamedears</groupId>
   <artifactId>Combat-Tag</artifactId>
   <packaging>jar</packaging>
-  <version>4.8.5-SNAPSHOT</version>
+  <version>6.0.3c2-SNAPSHOT</version>
   <name>Combat-Tag</name>
-  <url>https://github.com/ttk2/Combat-Tag</url>
+  <url>https://github.com/erocs/Combat-Tag</url>
   
   <build>
     <pluginManagement>
